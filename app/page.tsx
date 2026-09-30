@@ -76,7 +76,7 @@ function HomePageContent() {
     if (typeof window === "undefined") return;
     const hostname = window.location.hostname;
     const parts = hostname.split(".");
-    
+
     let sub: string | null = null;
     if (hostname.includes("localhost") || hostname.includes("127.0.0.1")) {
       if (parts.length > 1 && parts[0] !== "localhost" && parts[0] !== "www") {
@@ -85,7 +85,7 @@ function HomePageContent() {
     } else if (parts.length > 2 && parts[0] !== "www") {
       sub = parts[0];
     }
-    
+
     if (sub) {
       setSubdomain(sub);
       fetch(`/api/host/profile?subdomain=${sub}`)
@@ -386,12 +386,12 @@ function HomePageContent() {
             </>
           ) : (
             <>
-              <Badge variant="secondary">Surf Yoga Community</Badge>
+              <Badge variant="secondary">Practical School of Philosophy </Badge>
               <h1 className="font-heading text-4xl font-semibold tracking-tight text-balance sm:text-5xl">
-                Find Your Retreat
+                Find Your yourself
               </h1>
               <p className="max-w-md text-sm leading-relaxed text-muted-foreground text-pretty">
-                Sync your travel dates once, then browse every listing with live pricing for your stay.
+                Sync your available dates once, then browse every classes with live pricing for your stay.
               </p>
             </>
           )}

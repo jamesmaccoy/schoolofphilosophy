@@ -96,10 +96,10 @@ function SubscribeContent() {
             ← Back to Home
           </Link>
           <h1 className="text-balance text-4xl font-bold tracking-tight sm:text-5xl">
-            Become a Pro
+            Become a member
           </h1>
           <p className="mt-4 text-muted-foreground max-w-lg mx-auto">
-            Choose a plan, unlock listing capabilities, and access exclusive Pro-only package deals.
+            Choose a plan, unlock classes and events, and access exclusive member-only package deals.
           </p>
         </div>
 
