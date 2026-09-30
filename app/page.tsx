@@ -388,10 +388,10 @@ function HomePageContent() {
             <>
               <Badge variant="secondary">Practical School of Philosophy </Badge>
               <h1 className="font-heading text-4xl font-semibold tracking-tight text-balance sm:text-5xl">
-                Find Your yourself
+                Is the unexamined life worth living or not?
               </h1>
               <p className="max-w-md text-sm leading-relaxed text-muted-foreground text-pretty">
-                Sync your available dates once, then browse every classes with live pricing for your stay.
+                Sync your available dates once, then browse every classes with pricing for the classes.
               </p>
             </>
           )}
@@ -547,7 +547,7 @@ function HomePageContent() {
           <div className="flex items-center justify-between gap-4">
             <h2 className="flex items-center gap-2 font-heading text-lg font-medium">
               <HouseIcon className="size-5 text-muted-foreground" />
-              Destination listings
+              All classes
             </h2>
             {!isLoadingProps && (
               <span className="text-sm text-muted-foreground">
