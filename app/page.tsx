@@ -5,13 +5,15 @@ import { useSearchParams } from "next/navigation";
 import { AuthProvider, useAuth } from "@/components/auth";
 import Link from "next/link";
 import { formatDisplayDate } from "@/lib/utils";
+import { getSubdomain } from "@/lib/subdomain";
 import {
   ArrowRightIcon,
+  BookOpenIcon,
   CalendarCheckIcon,
   CheckIcon,
   ClockIcon,
   CopyIcon,
-  HouseIcon,
+  GraduationCapIcon,
   ImageOffIcon,
   LockIcon,
   PinIcon,
@@ -74,28 +76,28 @@ function HomePageContent() {
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const hostname = window.location.hostname;
-    const parts = hostname.split(".");
-
-    let sub: string | null = null;
-    if (hostname.includes("localhost") || hostname.includes("127.0.0.1")) {
-      if (parts.length > 1 && parts[0] !== "localhost" && parts[0] !== "www") {
-        sub = parts[0];
-      }
-    } else if (parts.length > 2 && parts[0] !== "www") {
-      sub = parts[0];
-    }
+    const sub = getSubdomain(window.location.hostname);
 
     if (sub) {
-      setSubdomain(sub);
       fetch(`/api/host/profile?subdomain=${sub}`)
         .then(res => res.json())
         .then(resJson => {
-          if (resJson.success) {
+          if (resJson.success && resJson.data) {
             setHostProfile(resJson.data);
+            setSubdomain(sub);
+          } else {
+            setSubdomain(null);
+            setHostProfile(null);
           }
         })
-        .catch(err => console.error("Failed to fetch host profile:", err));
+        .catch(err => {
+          console.error("Failed to fetch host profile:", err);
+          setSubdomain(null);
+          setHostProfile(null);
+        });
+    } else {
+      setSubdomain(null);
+      setHostProfile(null);
     }
   }, []);
 
@@ -291,7 +293,7 @@ function HomePageContent() {
     setSaveError(null);
 
     if (!user) {
-      setSaveError("Please sign in or register to save your stay dates.");
+      setSaveError("Please sign in or register to save your course schedule.");
       return;
     }
 
@@ -315,7 +317,7 @@ function HomePageContent() {
       setSaveError(
         isHourlySaved
           ? "Please select a valid date."
-          : "Please select valid check-in and check-out dates."
+          : "Please select valid start and end dates."
       );
       return;
     }
@@ -372,26 +374,26 @@ function HomePageContent() {
                 PRO PORTAL • {hostProfile.subdomain}
               </Badge>
               <h1 className="font-heading text-4xl font-semibold tracking-tight text-balance sm:text-5xl">
-                {hostProfile.displayName ? `${hostProfile.displayName}'s Listings` : "Your Cozy Stay"}
+                {hostProfile.displayName ? `${hostProfile.displayName}'s Courses` : "Philosophy Courses"}
               </h1>
               <p className="max-w-md text-sm leading-relaxed text-muted-foreground text-pretty">
-                Explore custom stays and packages curated directly by {hostProfile.displayName || "our premium host"}.
+                Explore custom courses and classes curated by {hostProfile.displayName || "our course instructor"}.
               </p>
               <a
                 href={typeof window !== "undefined" ? `${window.location.protocol}//${window.location.host.replace(`${subdomain}.`, "")}` : "/"}
                 className="text-xs text-teal-600 dark:text-teal-400 hover:underline flex items-center gap-1 font-bold mt-2"
               >
-                ← View all Simpleplek locations
+                ← View all courses
               </a>
             </>
           ) : (
             <>
-              <Badge variant="secondary">Practical School of Philosophy </Badge>
+              <Badge variant="secondary">Practical School of Philosophy</Badge>
               <h1 className="font-heading text-4xl font-semibold tracking-tight text-balance sm:text-5xl">
                 Is the unexamined life worth living or not?
               </h1>
               <p className="max-w-md text-sm leading-relaxed text-muted-foreground text-pretty">
-                Sync your available dates once, then browse every classes with pricing for the classes.
+                Sync your schedule once, then explore philosophy courses and classes with member pricing.
               </p>
             </>
           )}
@@ -400,9 +402,9 @@ function HomePageContent() {
         {paymentStatus === "success" && (
           <Alert className="mx-auto w-full max-w-3xl">
             <CheckIcon />
-            <AlertTitle>Payment received</AlertTitle>
+            <AlertTitle>Registration confirmed</AlertTitle>
             <AlertDescription>
-              Your stay booking is secured for R {amountPaid}.
+              Your course registration is secured for R {amountPaid}.
             </AlertDescription>
           </Alert>
         )}
@@ -417,14 +419,14 @@ function HomePageContent() {
                 <div className="flex flex-col gap-1">
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
-                      Latest active estimate
+                      Latest active course estimate
                     </span>
                     <Badge variant={isEstimatePaid ? "default" : "outline"}>
                       {isEstimatePaid ? "Paid" : "Pending"}
                     </Badge>
                   </div>
                   <p className="font-heading text-base font-medium">
-                    {estimatePropertyTitle || "Llandudno Stay"}
+                    {estimatePropertyTitle || "Philosophy Course"}
                     <span className="ml-2 text-sm font-normal text-muted-foreground">
                       R {latestEstimate.total.toLocaleString()}
                     </span>
@@ -458,7 +460,7 @@ function HomePageContent() {
           <Card size="sm" className="shadow-lg">
             <CardContent className="flex flex-col gap-3 sm:flex-row sm:items-end">
               <Field className="flex-1">
-                <FieldLabel htmlFor="from-date">Check-in date</FieldLabel>
+                <FieldLabel htmlFor="from-date">Start date</FieldLabel>
                 <Input
                   id="from-date"
                   type="date"
@@ -470,7 +472,7 @@ function HomePageContent() {
                     } else {
                       const d = new Date(e.target.value);
                       if (!isNaN(d.getTime())) {
-                        d.setDate(d.getDate() + nights);
+                        d.setDate(d.getDate() + nights * 7);
                         setToDate(d.toISOString().split("T")[0]);
                       }
                     }
@@ -480,7 +482,7 @@ function HomePageContent() {
 
               {isHourlySaved && savedDates ? (
                 <Field className="flex-1">
-                  <FieldLabel htmlFor="slot-window">Slot window</FieldLabel>
+                  <FieldLabel htmlFor="slot-window">Session time slot</FieldLabel>
                   <div
                     id="slot-window"
                     className="flex h-9 items-center gap-2 rounded-md border bg-muted/50 px-3 text-sm font-medium"
@@ -491,7 +493,7 @@ function HomePageContent() {
                 </Field>
               ) : (
                 <Field className="flex-1">
-                  <FieldLabel htmlFor="nights">Nights</FieldLabel>
+                  <FieldLabel htmlFor="nights">Duration (weeks)</FieldLabel>
                   <Input
                     id="nights"
                     type="number"
@@ -503,7 +505,7 @@ function HomePageContent() {
                       setNights(val);
                       const d = new Date(fromDate);
                       if (!isNaN(d.getTime())) {
-                        d.setDate(d.getDate() + val);
+                        d.setDate(d.getDate() + val * 7);
                         setToDate(d.toISOString().split("T")[0]);
                       }
                     }}
@@ -546,12 +548,12 @@ function HomePageContent() {
         <section className="flex flex-col gap-6 pt-4">
           <div className="flex items-center justify-between gap-4">
             <h2 className="flex items-center gap-2 font-heading text-lg font-medium">
-              <HouseIcon className="size-5 text-muted-foreground" />
-              All classes
+              <GraduationCapIcon className="size-5 text-muted-foreground" />
+              All courses & classes
             </h2>
             {!isLoadingProps && (
               <span className="text-sm text-muted-foreground">
-                {properties.length} location{properties.length === 1 ? "" : "s"} available
+                {properties.length} course{properties.length === 1 ? "" : "s"} available
               </span>
             )}
           </div>
@@ -575,11 +577,11 @@ function HomePageContent() {
             <Empty>
               <EmptyHeader>
                 <EmptyMedia variant="icon">
-                  <HouseIcon />
+                  <BookOpenIcon />
                 </EmptyMedia>
-                <EmptyTitle>No listings yet</EmptyTitle>
+                <EmptyTitle>No courses yet</EmptyTitle>
                 <EmptyDescription>
-                  There are no destination properties available right now. Check back soon.
+                  There are no philosophy courses or classes available right now. Check back soon.
                 </EmptyDescription>
               </EmptyHeader>
             </Empty>
@@ -613,7 +615,7 @@ function HomePageContent() {
                       )}
 
                       <Badge variant="secondary" className="absolute top-3 left-3">
-                        {isHourly ? "Hourly slot" : "Nightly stay"}
+                        {isHourly ? "Single Session / Workshop" : "Weekly Course"}
                       </Badge>
                     </div>
 
@@ -621,8 +623,8 @@ function HomePageContent() {
                       <CardTitle>{p.title}</CardTitle>
                       <CardDescription>
                         {isHourly
-                          ? "Book a single time slot"
-                          : `Priced per night for your synced window`}
+                          ? "Book a single lecture or discussion slot"
+                          : `Structured multi-week philosophy course`}
                       </CardDescription>
                     </CardHeader>
 
@@ -635,11 +637,11 @@ function HomePageContent() {
                             ) : (
                               <CalendarCheckIcon className="size-3.5" />
                             )}
-                            {isHourly ? "Applied slot" : "Schedule window"}
+                            {isHourly ? "Class time slot" : "Course schedule"}
                           </span>
                           {savedDates && !isHourly && (
                             <Badge variant="outline">
-                              {nights} night{nights > 1 ? "s" : ""}
+                              {nights} week{nights > 1 ? "s" : ""}
                             </Badge>
                           )}
                         </div>
@@ -658,13 +660,13 @@ function HomePageContent() {
                           ) : (
                             <div className="grid grid-cols-2 gap-2">
                               <div className="flex flex-col gap-0.5 rounded-md bg-background px-3 py-1.5">
-                                <span className="text-xs text-muted-foreground">Check-in</span>
+                                <span className="text-xs text-muted-foreground">Term start</span>
                                 <span className="text-sm font-medium">
                                   {formatDisplayDate(savedDates.fromDate)}
                                 </span>
                               </div>
                               <div className="flex flex-col gap-0.5 rounded-md bg-background px-3 py-1.5">
-                                <span className="text-xs text-muted-foreground">Check-out</span>
+                                <span className="text-xs text-muted-foreground">Term end</span>
                                 <span className="text-sm font-medium">
                                   {formatDisplayDate(savedDates.toDate)}
                                 </span>
@@ -673,7 +675,7 @@ function HomePageContent() {
                           )
                         ) : (
                           <p className="text-sm text-muted-foreground">
-                            Sync dates above to configure pricing.
+                            Sync dates above to configure schedule.
                           </p>
                         )}
                       </div>
@@ -682,18 +684,18 @@ function HomePageContent() {
                     <CardFooter className="justify-between">
                       <div className="flex flex-col gap-0.5">
                         <span className="text-xs text-muted-foreground">
-                          {isHourly ? "Hourly rate" : "Nightly rate"}
+                          {isHourly ? "Session fee" : "Course tuition"}
                         </span>
                         <span className="font-heading text-base font-semibold">
                           R {p.basePricePerNight.toLocaleString()}
                           <span className="text-sm font-normal text-muted-foreground">
-                            {isHourly ? "/slot" : "/night"}
+                            {isHourly ? "/session" : "/term"}
                           </span>
                         </span>
                       </div>
 
                       <span className="pointer-events-none inline-flex items-center gap-1.5 text-sm font-medium text-primary">
-                        View details
+                        View course
                         <ArrowRightIcon className="size-4 transition-transform group-hover:translate-x-0.5" />
                       </span>
                     </CardFooter>

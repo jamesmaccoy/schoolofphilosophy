@@ -39,7 +39,7 @@ export default function LoginPage() {
             The School of Practical Philosophy
           </h1>
           <p className="text-sm leading-relaxed text-muted-foreground">
-            Sign in to configure dates and lock bookings
+            Sign in to manage course schedules and registrations
           </p>
         </header>
 

@@ -16,8 +16,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Simple Plek",
-  description: "Unique packages for inaccesible locations",
+  title: "School of Practical Philosophy",
+  description: "Practical philosophy courses, classes, and discussions for everyday life.",
 };
 
 export default function RootLayout({

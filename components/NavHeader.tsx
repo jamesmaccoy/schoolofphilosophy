@@ -19,7 +19,7 @@ export default function NavHeader() {
           href="/"
           className="flex items-center gap-2 rounded-md transition-opacity hover:opacity-80 focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
         >
-          <Image src="/Plek.svg" alt="Simple Plek" width={50} height={50} />
+          <Image src="/Plek.svg" alt="School of Practical Philosophy" width={50} height={50} />
           <span aria-hidden="true" className="size-1.5 rounded-full bg-primary" />
         </Link>
 
@@ -29,14 +29,14 @@ export default function NavHeader() {
             href="/bookings"
             className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
           >
-            Bookings
+            Registrations
           </Link>
           {!user?.isAdmin && (
             <Link
               href="/subscribe"
               className="text-sm font-medium text-primary transition-colors hover:text-primary/80"
             >
-              Become Pro
+              Membership
             </Link>
           )}
           {user?.isAdmin && (

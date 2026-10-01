@@ -14,6 +14,7 @@ import {
 import { TriangleAlertIcon, CheckCircle2Icon } from "lucide-react";
 
 import { auth } from "@/lib/clientApp";
+import { getSubdomain, getBaseHost } from "@/lib/subdomain";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -322,24 +323,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       if (typeof window !== "undefined") {
         const hostname = window.location.hostname;
-        const parts = hostname.split(".");
-        let isSubdomain = false;
-        let baseHost = hostname;
+        const sub = getSubdomain(hostname);
 
-        if (hostname.includes("simpleplek.co.za")) {
-          isSubdomain = hostname !== "simpleplek.co.za" && !hostname.startsWith("www.simpleplek.co.za");
-          baseHost = "simpleplek.co.za";
-        } else if (hostname.includes("localhost") || hostname.includes("127.0.0.1")) {
-          if (parts.length > 1 && parts[0] !== "localhost" && parts[0] !== "www") {
-            isSubdomain = true;
-            baseHost = "localhost:3000";
-          }
-        } else if (parts.length > 2 && parts[0] !== "www") {
-          isSubdomain = true;
-          baseHost = parts.slice(-2).join(".");
-        }
-
-        if (isSubdomain) {
+        if (sub) {
+          const baseHost = getBaseHost(hostname);
           const redirectUrl = `${window.location.protocol}//${baseHost}/login?redirect_to=${encodeURIComponent(window.location.href)}`;
           window.location.href = redirectUrl;
           return;
